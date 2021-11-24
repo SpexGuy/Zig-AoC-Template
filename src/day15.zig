@@ -2,10 +2,11 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 const assert = std.debug.assert;
 const print = std.debug.print;
-const ArrayList = std.ArrayList;
-const HashMap = std.AutoHashMap;
-const StringHashMap = std.StringHashMap;
+const List = std.ArrayList;
+const Map = std.AutoHashMap;
+const StrMap = std.StringHashMap;
 const BitSet = std.DynamicBitSet;
+const Str = []const u8;
 
 const util = @import("util.zig");
 const gpa = util.gpa;
