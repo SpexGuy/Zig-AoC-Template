@@ -7,11 +7,7 @@ const HashMap = std.AutoHashMap;
 const StringHashMap = std.StringHashMap;
 const BitSet = std.DynamicBitSet;
 
-const util = @import("util.zig");
-const gpa = util.gpa;
+var gpa_impl = std.heap.GeneralPurposeAllocator(.{}){};
+pub const gpa = &gpa_impl.allocator;
 
-const data = @embedFile("../data/day21.txt");
-
-pub fn main() !void {
-    
-}
+// Add utility functions here

@@ -7,8 +7,8 @@ const HashMap = std.AutoHashMap;
 const StringHashMap = std.StringHashMap;
 const BitSet = std.DynamicBitSet;
 
-var gpa_impl = std.heap.GeneralPurposeAllocator(.{}){};
-const gpa = &gpa_impl.allocator;
+const util = @import("util.zig");
+const gpa = util.gpa;
 
 const data = @embedFile("../data/day16.txt");
 
