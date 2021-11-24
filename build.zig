@@ -5,12 +5,13 @@ const LibExeObjStep = std.build.LibExeObjStep;
 // set this to true to link libc
 const should_link_libc = false;
 
-const test_files = [_][]const u8 {
+const test_files = [_][]const u8{
     // list any zig files with tests here
 };
 
 fn linkObject(b: *Builder, obj: *LibExeObjStep) void {
     if (should_link_libc) obj.linkLibC();
+    _ = b;
 
     // Add linking for packages or third party libraries here
 }
@@ -26,14 +27,15 @@ pub fn build(b: *Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
-    // Set up an exe for each day
-    comptime var day = 1;
-    inline while (day <= 25) : (day += 1) {
-        @setEvalBranchQuota(100000); // this comptimePrint is pretty expensive
-        const dayString = comptime std.fmt.comptimePrint("day{:0>2}", .{ day });
-        const zigFile = "src/" ++ dayString ++ ".zig";
+    const install_all = b.step("install_all", "Install all days");
+    const run_all = b.step("run_all", "Run all days");
 
-        
+    // Set up an exe for each day
+    var day: u32 = 1;
+    while (day <= 25) : (day += 1) {
+        const dayString = b.fmt("day{:0>2}", .{day});
+        const zigFile = b.fmt("src/{s}.zig", .{dayString});
+
         const exe = b.addExecutable(dayString, zigFile);
         exe.setTarget(target);
         exe.setBuildMode(mode);
@@ -43,8 +45,11 @@ pub fn build(b: *Builder) void {
 
         const install_cmd = b.addInstallArtifact(exe);
 
-        const install_step = b.step("install_" ++ dayString, "Install " ++ dayString ++ ".exe");
+        const step_key = b.fmt("install_{s}", .{dayString});
+        const step_desc = b.fmt("Install {s}.exe", .{dayString});
+        const install_step = b.step(step_key, step_desc);
         install_step.dependOn(&install_cmd.step);
+        install_all.dependOn(&install_cmd.step);
 
         const run_cmd = exe.run();
         run_cmd.step.dependOn(&install_cmd.step);
@@ -52,8 +57,10 @@ pub fn build(b: *Builder) void {
             run_cmd.addArgs(args);
         }
 
-        const run_step = b.step(dayString, "Run " ++ dayString);
+        const run_desc = b.fmt("Run {s}", .{dayString});
+        const run_step = b.step(dayString, run_desc);
         run_step.dependOn(&run_cmd.step);
+        run_all.dependOn(&run_cmd.step);
     }
 
     // Set up a step to run all tests
