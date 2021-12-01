@@ -28,6 +28,9 @@ const trim = std.mem.trim;
 const sliceMin = std.mem.min;
 const sliceMax = std.mem.max;
 
+const parseInt = std.fmt.parseInt;
+const parseFloat = std.fmt.parseFloat;
+
 const min = std.math.min;
 const min3 = std.math.min3;
 const max = std.math.max;
