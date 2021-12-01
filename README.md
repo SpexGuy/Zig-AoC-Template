@@ -20,7 +20,7 @@ If you would like to contribute project files for other development environments
 
 ## Setting up ZLS
 
-Zig has a reasonably robust language server, which can provide autocomplete for VSCode and many other features.  It can help significantly with exploring the std lib and suggesting parameter completions.  To set it up, make sure you have an up-to-date master build of Zig (which you can [download here](https://ziglang.org/download/)), and then run the following commands:
+Zig has a reasonably robust language server, which can provide autocomplete for VSCode and many other editors.  It can help significantly with exploring the std lib and suggesting parameter completions.  To set it up, make sure you have an up-to-date master build of Zig (which you can [download here](https://ziglang.org/download/)), and then run the following commands:
 
 ```
 git clone --recurse-submodules https://github.com/zigtools/zls
