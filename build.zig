@@ -5,10 +5,6 @@ const LibExeObjStep = std.build.LibExeObjStep;
 // set this to true to link libc
 const should_link_libc = false;
 
-const test_files = [_][]const u8{
-    // list any zig files with tests here
-};
-
 fn linkObject(b: *Builder, obj: *LibExeObjStep) void {
     if (should_link_libc) obj.linkLibC();
     _ = b;
@@ -16,7 +12,21 @@ fn linkObject(b: *Builder, obj: *LibExeObjStep) void {
     // Add linking for packages or third party libraries here
 }
 
+const required_zig_version = std.SemanticVersion.parse("0.9.0-dev.1920+de81c504b") catch unreachable;
+
 pub fn build(b: *Builder) void {
+    if (comptime @import("builtin").zig_version.order(required_zig_version) == .lt) {
+        std.debug.print(
+            \\Error: Your version of Zig is missing features that are needed for this template.
+            \\You will need to download a newer build.
+            \\
+            \\    https://ziglang.org/download/
+            \\
+            \\
+        , .{});
+        std.os.exit(1);
+    }
+
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
@@ -28,6 +38,7 @@ pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
 
     const install_all = b.step("install_all", "Install all days");
+    const install_all_tests = b.step("install_tests_all", "Install tests for all days");
     const run_all = b.step("run_all", "Run all days");
 
     // Set up an exe for each day
@@ -45,11 +56,39 @@ pub fn build(b: *Builder) void {
 
         const install_cmd = b.addInstallArtifact(exe);
 
-        const step_key = b.fmt("install_{s}", .{dayString});
-        const step_desc = b.fmt("Install {s}.exe", .{dayString});
-        const install_step = b.step(step_key, step_desc);
-        install_step.dependOn(&install_cmd.step);
-        install_all.dependOn(&install_cmd.step);
+        const run_test = b.addTest(zigFile);
+        run_test.setTarget(target);
+        run_test.setBuildMode(mode);
+        linkObject(b, exe);
+
+        const build_test = b.addTestExe(b.fmt("test_{s}", .{dayString}), zigFile);
+        build_test.setTarget(target);
+        build_test.setBuildMode(mode);
+        linkObject(b, exe);
+        const install_test = b.addInstallArtifact(build_test);
+
+        {
+            const step_key = b.fmt("install_{s}", .{dayString});
+            const step_desc = b.fmt("Install {s}.exe", .{dayString});
+            const install_step = b.step(step_key, step_desc);
+            install_step.dependOn(&install_cmd.step);
+            install_all.dependOn(&install_cmd.step);
+        }
+
+        {
+            const step_key = b.fmt("test_{s}", .{dayString});
+            const step_desc = b.fmt("Run tests in {s}", .{zigFile});
+            const step = b.step(step_key, step_desc);
+            step.dependOn(&run_test.step);
+        }
+
+        {
+            const step_key = b.fmt("install_tests_{s}", .{dayString});
+            const step_desc = b.fmt("Install test_{s}.exe", .{dayString});
+            const step = b.step(step_key, step_desc);
+            step.dependOn(&install_test.step);
+            install_all_tests.dependOn(&install_test.step);
+        }
 
         const run_cmd = exe.run();
         run_cmd.step.dependOn(&install_cmd.step);
@@ -63,14 +102,45 @@ pub fn build(b: *Builder) void {
         run_all.dependOn(&run_cmd.step);
     }
 
-    // Set up a step to run all tests
-    const test_step = b.step("test", "Run all tests");
-    for (test_files) |file| {
-        const test_cmd = b.addTest(file);
+    // Set up tests for util.zig
+    {
+        const test_util = b.step("test_util", "Run tests in util.zig");
+        const test_cmd = b.addTest("src/util.zig");
         test_cmd.setTarget(target);
         test_cmd.setBuildMode(mode);
         linkObject(b, test_cmd);
+        test_util.dependOn(&test_cmd.step);
+    }
 
+    // Set up test executable for util.zig
+    {
+        const test_util = b.step("install_tests_util", "Run tests in util.zig");
+        const test_exe = b.addTestExe("test_util", "src/util.zig");
+        test_exe.setTarget(target);
+        test_exe.setBuildMode(mode);
+        linkObject(b, test_exe);
+        const install = b.addInstallArtifact(test_exe);
+        test_util.dependOn(&install.step);
+    }
+
+    // Set up a step to run all tests
+    {
+        const test_step = b.step("test", "Run all tests");
+        const test_cmd = b.addTest("src/test_all.zig");
+        test_cmd.setTarget(target);
+        test_cmd.setBuildMode(mode);
+        linkObject(b, test_cmd);
         test_step.dependOn(&test_cmd.step);
+    }
+
+    // Set up a step to build tests (but not run them)
+    {
+        const test_build = b.step("install_tests", "Install test_all.exe");
+        const test_exe = b.addTestExe("test_all", "src/test_all.zig");
+        test_exe.setTarget(target);
+        test_exe.setBuildMode(mode);
+        linkObject(b, test_exe);
+        const test_exe_install = b.addInstallArtifact(test_exe);
+        test_build.dependOn(&test_exe_install.step);
     }
 }
