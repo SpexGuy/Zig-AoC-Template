@@ -2,7 +2,7 @@
 
 This repo provides a template for Advent of Code participants using Zig.  It contains a main file for each day, a build.zig file set up with targets for each day, and Visual Studio Code files for debugging.
 
-This template tracks the master branch of Zig, *not* 0.8.1.  It may not work with older versions.
+This template has been tested with Zig 0.10.0.  It may not work with other versions.
 
 ## How to use this template:
 
@@ -12,7 +12,7 @@ Each day contains a decl like this:
 ```zig
 const data = @embedFile("../data/day05.txt");
 ```
-To use this system, save your input for a day in the data/ directory with the appropriate name.  Reference this decl to load the contents of that file as a compile time constant.  If a day has no input, or you prefer not to embed it in this form, simply don't reference this decl.  If it's unused, it will not try to load the file, and it won't error if the file does not exist.
+To use this system, save your input for a day in the data/ directory with the appropriate name.  Reference this decl to load the contents of that file as a compile time constant.  If a day has no input, or you prefer not to embed it in this form, simply don't reference this decl.  If `data` is unused, the compiler will not try to load the file, and it won't error if the file does not exist.
 
 This repo also contains Visual Studio Code project files for debugging.  These are meant to work with the C/C++ plugin.  There is a debug configuration for each day.  By default all days are built in debug mode, but this can be changed by editing `.vscode/tasks.json` if you have a need for speed.
 
@@ -20,13 +20,4 @@ If you would like to contribute project files for other development environments
 
 ## Setting up ZLS
 
-Zig has a reasonably robust language server, which can provide autocomplete for VSCode and many other editors.  It can help significantly with exploring the std lib and suggesting parameter completions.  To set it up, make sure you have an up-to-date master build of Zig (which you can [download here](https://ziglang.org/download/)), and then run the following commands:
-
-```
-git clone --recurse-submodules https://github.com/zigtools/zls
-cd zls
-zig build -Drelease-fast
-zig-out/bin/zls configure
-```
-
-The last command will direct you to documentation for connecting it to your preferred editor.  If you are using VSCode, the documentation [can be found here](https://github.com/zigtools/zls/wiki/Installing-for-Visual-Studio-Code).
+Zig has a reasonably robust language server, which can provide autocomplete for VSCode and many other editors.  It can help significantly with exploring the std lib and suggesting parameter completions.  The VSCode extension (augusterame.zls-vscode) will automatically install the language server in the background.  If you are using a different editor, follow their [install instructions](https://zigtools.github.io/install-zls/).  If you want to install a specific version of the language server (for example for maximum compatibility with 0.10.0), [check their releases page](https://github.com/zigtools/zls/releases) or [follow their instructions to build from source](https://github.com/zigtools/zls#from-source).  Note that ZLS tracks master, so if you are using Zig 0.10.0 you may need to download a newer version to build ZLS.
