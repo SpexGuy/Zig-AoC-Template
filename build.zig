@@ -52,6 +52,17 @@ pub fn build(b: *Builder) void {
         exe.setBuildMode(mode);
         linkObject(b, exe);
 
+        // NOTE: This line can be commented out once #13480 is fixed.
+        // https://github.com/ziglang/zig/issues/13480
+        // The fix is slated to be merged in PR #13637.
+        // https://github.com/ziglang/zig/pull/13637
+        // Until then, stage 1 is probably the better default for advent of code,
+        // due to the common use of std.StaticBitSet.
+        // If you are using a master branch build of zig, this line may cause
+        // a compile error.  You can safely remove it as long as you have a build
+        // from after when PR #13637 was merged.
+        exe.use_stage1 = true; // compile error? see comment above.
+
         exe.install();
 
         const install_cmd = b.addInstallArtifact(exe);
