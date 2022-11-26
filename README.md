@@ -20,7 +20,7 @@ If you would like to contribute project files for other development environments
 
 ## Modifying the template
 
-You can modify the template to add your own changes across all days.  To do so, modify template/template.zig and then run `zig build generate`.  The `$` character in the template will be replaced by the two-digit day number (e.g. 04 or 17).  This step will only overwrite files which have not been modified, so you will not lose work if you update the template after implementing several days.  After updating the template and generating, you should check in template/hashes.bin in addition to the updated template and source files.  This will ensure that the newly generated files are not considered modified if you update the template again.
+You can modify the template to add your own changes across all days.  To do so, modify template/template.zig and then run `zig build generate`.  The `$` character in the template will be replaced by the two-digit day number (e.g. 04 or 17).  This step will only overwrite files which have not been modified, so you will not lose work if you update the template after implementing several days.  After updating the template and generating, you should commit the changes to template/hashes.bin in addition to the updated template and source files.  This will ensure that the newly generated files are not considered modified if you update the template again.
 
 ## Setting up ZLS
 
