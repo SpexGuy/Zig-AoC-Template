@@ -41,6 +41,13 @@ pub fn build(b: *Builder) void {
     const install_all_tests = b.step("install_tests_all", "Install tests for all days");
     const run_all = b.step("run_all", "Run all days");
 
+    const generate = b.step("generate", "Generate stub files from template/template.zig");
+    const build_generate = b.addExecutable("generate", "template/generate.zig");
+    build_generate.setBuildMode(.ReleaseSafe);
+    const run_generate = build_generate.run();
+    run_generate.cwd = std.fs.path.dirname(@src().file).?;
+    generate.dependOn(&run_generate.step);
+
     // Set up an exe for each day
     var day: u32 = 1;
     while (day <= 25) : (day += 1) {

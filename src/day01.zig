@@ -4,7 +4,6 @@ const List = std.ArrayList;
 const Map = std.AutoHashMap;
 const StrMap = std.StringHashMap;
 const BitSet = std.DynamicBitSet;
-const Str = []const u8;
 
 const util = @import("util.zig");
 const gpa = util.gpa;
@@ -12,7 +11,7 @@ const gpa = util.gpa;
 const data = @embedFile("../data/day01.txt");
 
 pub fn main() !void {
-
+    
 }
 
 // Useful stdlib functions
@@ -42,3 +41,7 @@ const assert = std.debug.assert;
 const sort = std.sort.sort;
 const asc = std.sort.asc;
 const desc = std.sort.desc;
+
+// Generated from template/template.zig.
+// Run `zig build generate` to update.
+// Only unmodified days will be updated.
