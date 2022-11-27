@@ -12,7 +12,8 @@ fn linkObject(b: *Builder, obj: *LibExeObjStep) void {
     // Add linking for packages or third party libraries here
 }
 
-const required_zig_version = std.SemanticVersion.parse("0.9.0-dev.1920+de81c504b") catch unreachable;
+const required_zig_version = std.SemanticVersion.parse("0.10.0") catch unreachable;
+const padded_int_fix = std.SemanticVersion.parse("0.11.0-dev.331+304e82808") catch unreachable;
 
 pub fn build(b: *Builder) void {
     if (comptime @import("builtin").zig_version.order(required_zig_version) == .lt) {
@@ -59,16 +60,14 @@ pub fn build(b: *Builder) void {
         exe.setBuildMode(mode);
         linkObject(b, exe);
 
-        // NOTE: This line can be commented out once #13480 is fixed.
-        // https://github.com/ziglang/zig/issues/13480
-        // The fix is slated to be merged in PR #13637.
-        // https://github.com/ziglang/zig/pull/13637
-        // Until then, stage 1 is probably the better default for advent of code,
-        // due to the common use of std.StaticBitSet.
-        // If you are using a master branch build of zig, this line may cause
-        // a compile error.  You can safely remove it as long as you have a build
-        // from after when PR #13637 was merged.
-        exe.use_stage1 = true; // compile error? see comment above.
+        // Padded integers are buggy in 0.10.0, fixed in 0.11.0-dev.331+304e82808
+        // This is especially bad for AoC because std.StaticBitSet is commonly used.
+        // If your version is older than that, we use stage1 to avoid this bug.
+        // Issue: https://github.com/ziglang/zig/issues/13480
+        // Fix: https://github.com/ziglang/zig/pull/13637
+        if (comptime @import("builtin").zig_version.order(padded_int_fix) == .lt) {
+            exe.use_stage1 = true;
+        }
 
         exe.install();
 
