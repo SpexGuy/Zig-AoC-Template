@@ -2,18 +2,27 @@ const std = @import("std");
 const Builder = std.build.Builder;
 const LibExeObjStep = std.build.LibExeObjStep;
 
-// set this to true to link libc
+const required_zig_version = std.SemanticVersion.parse("0.10.0") catch unreachable;
+const padded_int_fix = std.SemanticVersion.parse("0.11.0-dev.331+304e82808") catch unreachable;
+
+/// set this to true to link libc
 const should_link_libc = false;
 
 fn linkObject(b: *Builder, obj: *LibExeObjStep) void {
     if (should_link_libc) obj.linkLibC();
     _ = b;
 
+    // Padded integers are buggy in 0.10.0, fixed in 0.11.0-dev.331+304e82808
+    // This is especially bad for AoC because std.StaticBitSet is commonly used.
+    // If your version is older than that, we use stage1 to avoid this bug.
+    // Issue: https://github.com/ziglang/zig/issues/13480
+    // Fix: https://github.com/ziglang/zig/pull/13637
+    if (comptime @import("builtin").zig_version.order(padded_int_fix) == .lt) {
+        obj.use_stage1 = true;
+    }
+
     // Add linking for packages or third party libraries here
 }
-
-const required_zig_version = std.SemanticVersion.parse("0.10.0") catch unreachable;
-const padded_int_fix = std.SemanticVersion.parse("0.11.0-dev.331+304e82808") catch unreachable;
 
 pub fn build(b: *Builder) void {
     if (comptime @import("builtin").zig_version.order(required_zig_version) == .lt) {
@@ -59,16 +68,6 @@ pub fn build(b: *Builder) void {
         exe.setTarget(target);
         exe.setBuildMode(mode);
         linkObject(b, exe);
-
-        // Padded integers are buggy in 0.10.0, fixed in 0.11.0-dev.331+304e82808
-        // This is especially bad for AoC because std.StaticBitSet is commonly used.
-        // If your version is older than that, we use stage1 to avoid this bug.
-        // Issue: https://github.com/ziglang/zig/issues/13480
-        // Fix: https://github.com/ziglang/zig/pull/13637
-        if (comptime @import("builtin").zig_version.order(padded_int_fix) == .lt) {
-            exe.use_stage1 = true;
-        }
-
         exe.install();
 
         const install_cmd = b.addInstallArtifact(exe);
