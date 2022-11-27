@@ -8,7 +8,7 @@ const BitSet = std.DynamicBitSet;
 const util = @import("util.zig");
 const gpa = util.gpa;
 
-const data = @embedFile("../data/day16.txt");
+const data = @embedFile("data/day16.txt");
 
 pub fn main() !void {
     
