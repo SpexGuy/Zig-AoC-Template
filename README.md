@@ -10,9 +10,9 @@ The src/ directory contains a main file for each day.  Put your code there.  The
 
 Each day contains a decl like this:
 ```zig
-const data = @embedFile("../data/day05.txt");
+const data = @embedFile("data/day05.txt");
 ```
-To use this system, save your input for a day in the data/ directory with the appropriate name.  Reference this decl to load the contents of that file as a compile time constant.  If a day has no input, or you prefer not to embed it in this form, simply don't reference this decl.  If `data` is unused, the compiler will not try to load the file, and it won't error if the file does not exist.
+To use this system, save your input for a day in the src/data/ directory with the appropriate name.  Reference this decl to load the contents of that file as a compile time constant.  If a day has no input, or you prefer not to embed it in this form, simply don't reference this decl.  If `data` is unused, the compiler will not try to load the file, and it won't error if the file does not exist.
 
 This repo also contains Visual Studio Code project files for debugging.  These are meant to work with the C/C++ plugin.  There is a debug configuration for each day.  By default all days are built in debug mode, but this can be changed by editing `.vscode/tasks.json` if you have a need for speed.
 
