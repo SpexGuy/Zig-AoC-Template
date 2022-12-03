@@ -11,7 +11,38 @@ const gpa = util.gpa;
 const data = @embedFile("data/day02.txt");
 
 pub fn main() !void {
-    
+  // Trim trailing \n's in file
+  var trimmed_data = trim(u8, data, "\n");
+  var rountes_by_line = split(u8, trimmed_data, "\n");
+  var naive_score: u16 = 0;
+  var informed_score: u16 = 0;
+  var scores = StrMap(u8).init(std.heap.page_allocator);
+  try scores.put("A X", 1 + 3);
+  try scores.put("A Y", 2 + 6);
+  try scores.put("A Z", 3);
+  try scores.put("B X", 1);
+  try scores.put("B Y", 2 + 3);
+  try scores.put("B Z", 3 + 6);
+  try scores.put("C X", 1 + 6);
+  try scores.put("C Y", 2);
+  try scores.put("C Z", 3 + 3);
+  var ldw_to_play = StrMap([]const u8).init(std.heap.page_allocator);
+  try ldw_to_play.put("A X", "A Z");
+  try ldw_to_play.put("A Y", "A X");
+  try ldw_to_play.put("A Z", "A Y");
+  try ldw_to_play.put("B X", "B X");
+  try ldw_to_play.put("B Y", "B Y");
+  try ldw_to_play.put("B Z", "B Z");
+  try ldw_to_play.put("C X", "C Y");
+  try ldw_to_play.put("C Y", "C Z");
+  try ldw_to_play.put("C Z", "C X");
+  while (rountes_by_line.next()) |round_line| {
+    const round_play = ldw_to_play.get(round_line) orelse "";
+    naive_score += scores.get(round_line) orelse 0;
+    informed_score += scores.get(round_play) orelse 0;
+  }
+  print("Answer 1: {}\n", .{naive_score});
+  print("Answer 2: {}\n", .{informed_score});
 }
 
 // Useful stdlib functions
