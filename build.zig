@@ -24,8 +24,6 @@ pub fn build(b: *Build) void {
     const mode = b.standardOptimizeOption(.{});
 
     const install_all = b.step("install_all", "Install all days");
-    const install_all_tests = b.step("install_tests_all", "Install tests for all days");
-    _ = install_all_tests;
     const run_all = b.step("run_all", "Run all days");
 
     const generate = b.step("generate", "Generate stub files from template/template.zig");
