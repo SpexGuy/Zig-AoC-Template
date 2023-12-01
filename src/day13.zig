@@ -10,7 +10,9 @@ const gpa = util.gpa;
 
 const data = @embedFile("data/day13.txt");
 
-pub fn main() !void {}
+pub fn main() !void {
+    
+}
 
 // Useful stdlib functions
 const tokenizeAny = std.mem.tokenizeAny;
