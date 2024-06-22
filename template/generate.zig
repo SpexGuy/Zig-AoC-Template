@@ -46,7 +46,7 @@ pub fn main() !void {
         },
         error.InvalidFormat => {
             std.debug.print("{s} is corrupted, delete it to silence this warning and assume all days have been modified.\n", .{hashes_file});
-            std.os.exit(1);
+            std.process.exit(1);
         },
         else => |e| {
             std.debug.print("Failed to open {s}: {}\n", .{ hashes_file, e });
@@ -116,7 +116,7 @@ pub fn main() !void {
     }
 
     if (updated_hashes) {
-        try std.fs.cwd().writeFile(hashes_file, std.mem.asBytes(hashes));
+        try std.fs.cwd().writeFile(.{ .sub_path = hashes_file, .data = std.mem.asBytes(hashes) });
         if (skipped_any) {
             std.debug.print("Some days were skipped. Delete them to force regeneration.\n", .{});
         }
