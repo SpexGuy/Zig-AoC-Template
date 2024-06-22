@@ -32,7 +32,7 @@ pub fn build(b: *Build) void {
         .root_source_file = b.path("template/generate.zig"),
         .optimize = .ReleaseSafe,
         .target = target
-        });
+    });
 
     const run_generate = b.addRunArtifact(build_generate);
     run_generate.setCwd(b.path("")); // This could probably be done in a more idiomatic way
