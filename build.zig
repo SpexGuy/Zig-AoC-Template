@@ -30,12 +30,13 @@ pub fn build(b: *Build) void {
     const build_generate = b.addExecutable(.{
         .target = target,
         .name = "generate",
-        .root_source_file = .{ .path = "template/generate.zig" },
+        .root_source_file = b.path("template/generate.zig"),
         .optimize = .ReleaseSafe,
+        .target = target
     });
 
     const run_generate = b.addRunArtifact(build_generate);
-    run_generate.setCwd(.{ .path = std.fs.path.dirname(@src().file).? });
+    run_generate.setCwd(b.path("")); // This could probably be done in a more idiomatic way
     generate.dependOn(&run_generate.step);
 
     // Set up an exe for each day
@@ -46,7 +47,7 @@ pub fn build(b: *Build) void {
 
         const exe = b.addExecutable(.{
             .name = dayString,
-            .root_source_file = .{ .path = zigFile },
+            .root_source_file = b.path(zigFile),
             .target = target,
             .optimize = mode,
         });
@@ -55,7 +56,7 @@ pub fn build(b: *Build) void {
         const install_cmd = b.addInstallArtifact(exe, .{});
 
         const build_test = b.addTest(.{
-            .root_source_file = .{ .path = zigFile },
+            .root_source_file = b.path(zigFile),
             .target = target,
             .optimize = mode,
         });
@@ -93,11 +94,21 @@ pub fn build(b: *Build) void {
     {
         const test_util = b.step("test_util", "Run tests in util.zig");
         const test_cmd = b.addTest(.{
-            .root_source_file = .{ .path = "src/util.zig" },
+            .root_source_file = b.path("src/util.zig"),
             .target = target,
             .optimize = mode,
         });
         linkObject(b, test_cmd);
         test_util.dependOn(&test_cmd.step);
     }
+
+    // Set up all tests contained in test_all.zig
+    const test_all = b.step("test", "Run all tests");
+    const all_tests = b.addTest(.{
+        .root_source_file = b.path("src/test_all.zig"),
+        .target = target,
+        .optimize = mode,
+    });
+    const run_all_tests = b.addRunArtifact(all_tests);
+    test_all.dependOn(&run_all_tests.step);
 }

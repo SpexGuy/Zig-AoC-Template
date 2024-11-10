@@ -116,7 +116,10 @@ pub fn main() !void {
     }
 
     if (updated_hashes) {
-        try std.fs.cwd().writeFile(hashes_file, std.mem.asBytes(hashes));
+        try std.fs.cwd().writeFile(.{
+            .sub_path = hashes_file,
+            .data = std.mem.asBytes(hashes)
+        });
         if (skipped_any) {
             std.debug.print("Some days were skipped. Delete them to force regeneration.\n", .{});
         }
