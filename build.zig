@@ -28,6 +28,7 @@ pub fn build(b: *Build) void {
 
     const generate = b.step("generate", "Generate stub files from template/template.zig");
     const build_generate = b.addExecutable(.{
+        .target = target,
         .name = "generate",
         .root_source_file = .{ .path = "template/generate.zig" },
         .optimize = .ReleaseSafe,

@@ -46,7 +46,7 @@ pub fn main() !void {
         },
         error.InvalidFormat => {
             std.debug.print("{s} is corrupted, delete it to silence this warning and assume all days have been modified.\n", .{hashes_file});
-            std.os.exit(1);
+            std.process.exit(1);
         },
         else => |e| {
             std.debug.print("Failed to open {s}: {}\n", .{ hashes_file, e });
